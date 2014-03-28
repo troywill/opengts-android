@@ -1,0 +1,657 @@
+* SUCCESS1
+  #+BEGIN_SRC java
+    // BEGIN TDW  
+    public void nema(View v) {
+        Location currentLocation = mLocationClient.getLastLocation();
+        // mLatLng.setText("nema");
+        // mLatLng.setText(LocationUtils.getLatLng(this, currentLocation));
+        mLatLng.setText(GPRMCEncode(currentLocation));
+    }
+    
+    /**
+       ,,* Encode a location as GPRMC string data.
+       ,,* <p/>
+       ,,* For details check org.opengts.util.Nmea0183#_parse_GPRMC(String)
+       ,,* (OpenGTS source)
+       ,,*
+       ,,* @param loc location
+       ,,* @return GPRMC data
+       ,,*/
+    public static String GPRMCEncode(Location loc) {
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat f = new DecimalFormat("0.000000", dfs);
+            
+        String gprmc = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,,",
+                                     "$GPRMC",
+                                     NMEAGPRMCTime(new Date(loc.getTime())),
+                                     "A",
+                                     NMEAGPRMCCoord(Math.abs(loc.getLatitude())),
+                                     (loc.getLatitude() >= 0) ? "N" : "S",
+                                     NMEAGPRMCCoord(Math.abs(loc.getLongitude())),
+                                     (loc.getLongitude() >= 0) ? "E" : "W",
+                                     f.format(MetersPerSecondToKnots(loc.getSpeed())),
+                                     f.format(loc.getBearing()),
+                                     NMEAGPRMCDate(new Date(loc.getTime()))
+                                     );
+            
+        gprmc += "*" + NMEACheckSum(gprmc);
+            
+        return gprmc;
+    }
+        
+    public static String NMEAGPRMCTime(Date dateToFormat) {
+        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss.SSS");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(dateToFormat);
+    }
+        
+    public static String NMEAGPRMCDate(Date dateToFormat) {
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(dateToFormat);
+    }
+        
+    public static String NMEAGPRMCCoord(double coord) {
+        // “DDDMM.MMMMM”
+        int degrees = (int) coord;
+        double minutes = (coord - degrees) * 60;
+            
+        DecimalFormat df = new DecimalFormat("00.00000", new DecimalFormatSymbols(Locale.US));
+        StringBuilder rCoord = new StringBuilder();
+        rCoord.append(degrees);
+        rCoord.append(df.format(minutes));
+            
+        return rCoord.toString();
+    }
+        
+    public static String NMEACheckSum(String msg) {
+        int chk = 0;
+        for (int i = 1; i < msg.length(); i++)
+            {
+                chk ^= msg.charAt(i);
+            }
+        String chk_s = Integer.toHexString(chk).toUpperCase();
+        while (chk_s.length() < 2)
+            {
+                chk_s = "0" + chk_s;
+            }
+        return chk_s;
+    }
+        
+    /**
+       ,,* Converts given meters/second to nautical mile/hour.
+       ,,*
+       ,,* @param mps meters per second
+       ,,* @return knots
+       ,,*/
+    public static double MetersPerSecondToKnots(double mps) {
+        // Google "meters per second to knots"
+        return mps * 1.94384449;
+    }
+        
+    // END TDW
+    
+  #+END_SRC
+  #+BEGIN_SRC xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/nema"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/stop_updates"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:onClick="nema"
+        android:text="@string/stop_updates" />
+
+</RelativeLayout>
+  
+  #+END_SRC
+  
+
+* LOGIN
+** [[http://localhost:8080/track/Track]]
+*** sysadmin
+    - Account :: sysadmin
+    - User :: (blank)
+    - Password :: password
+*** prestige
+    - Account :: prestige
+    - User :: (blank)
+    - Password :: prestige
+***  select accountID, password from Account;     
+* LINKS
+  - [[http://localhost:8080][http://localhost:8080]]
+  - [[http://localhost:8080/track/Track]]
+    - Account :: sysadmin
+    - User :: (blank)
+    - Password :: password
+* [10/16] Step by step
+  1. [X] Install Java
+  2. [X] Install Java Mail
+     1. [X] Skim https://java.net/projects/javamail/pages/Home
+     2. [X] Download javax.mail-1.5.1.jar
+     3. [X] sudo cp javax.mail-1.5.1.jar $JAVA_HOME/jre/lib/ext/
+  3. [X] sudo systemctl start mysqld
+  4. [X] Install JDBC FIXME!
+     1. [X] Skim https://wiki.archlinux.org/index.php/JDBC_and_MySQL#Installing_JDBC
+     2. [X] wget https://aur.archlinux.org/packages/ma/mariadb-jdbc/mariadb-jdbc.tar.gz
+     3. [X] untar and descend into mariadb-jdbc
+     4. [X] makepkg --syncdeps
+     5. [X] sudo pacman -U mariadb-jdbc-1.1.5-1-any.pkg.tar.xz
+     6. [X] sudo cp -iv /usr/share/java/mysql-jdbc/mysql-connector-java-5.1.27-bin.jar /usr/lib/jvm/java-7-openjdk/jre/lib/ext/
+  5. [X] Install apache ant
+     #+BEGIN_SRC sh
+       sudo pacman --sync apache-ant
+     #+END_SRC
+  6. [X] Configure Apache Ant
+  7. [-] Install Apache "Tomcat"
+     1. [X] see https://wiki.archlinux.org/index.php/Tomcat
+     2. [X] install
+        #+BEGIN_SRC sh
+          pacman --sync tomcat7
+        #+END_SRC
+     3. [ ] sudo ln -s /usr/share/tomcat7/ tomcat
+     4. [X] sudo systemctl start tomcat7
+     5. [X] test
+        1. [X] save file
+           #+BEGIN_SRC java :tangle TestMysql.java
+             public class TestMysql {
+                 public static void main(String[] args) {
+                     try {
+                         Class.forName("com.mysql.jdbc.Driver").newInstance();
+                     } catch (Exception e) {
+                         System.out.println("The driver couldn't be loaded");
+                         return;
+                     }
+                     System.out.println("The driver was loaded");
+                 }
+             }
+           #+END_SRC
+        2. [X] compile the file
+           #+BEGIN_SRC sh
+             javac TestMysql.java
+           #+END_SRC
+        3. [X] Run the file
+           #+BEGIN_SRC sh :tangle run-TestMysql.sh
+             # CLASSPATH=/usr/lib/jvm/java-7-openjdk/jre/lib/ext
+             CLASSPATH=/usr/lib/jvm/java-7-openjdk/jre/lib/ext
+             java -classpath :${CLASSPATH} TestMysql
+           #+END_SRC
+  8. [X] Install the OpenGTS Source
+     1. [X] script
+        #+BEGIN_SRC sh :tangle install-opengts.sh :shebang #!/usr/bin/bash
+          set -o errexit
+          VERSION="2.5.1"
+          ZIP_FILE=~/Downloads/OpenGTS_${VERSION}.zip
+          USER="troy"
+          GROUP="users"
+          cd /usr/local
+          sudo unzip $ZIP_FILE
+          sudo chown --recursive $USER:$GROUP OpenGTS_${VERSION}
+        #+END_SRC
+     2. [X] export GTS_HOME=/usr/local/OpenGTS_2.5.1
+     3. [X] Set the Environment Variables
+        #+BEGIN_SRC sh
+          # The Java JDK (NOT the JRE) installation directory.
+          export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
+          # The Apache Ant installation directory.
+          export ANT_HOME=/usr/share/apache-ant
+          # The Apache Tomcat installation directory.
+          export CATALINA_HOME=/usr/share/tomcat7
+          # The OpenGTS installation directory.
+          export GTS_HOME=/usr/local/OpenGTS_2.5.1
+        #+END_SRC
+     4. [X] Symbolic Links
+        #+BEGIN_SRC sh
+          cd /usr/local
+          ln -s $JAVA_HOME java
+          ln -s $CATALINA_HOME tomcat
+          ln -s $GTS_HOME gts
+        #+END_SRC
+     5. [X] Compile the Supporting GTS Library Files.
+        1. [X] 'cd' into the OpenGTS installation directory and
+           compile the jar files, and servlet war files, using the
+           supplied Ant "build.xml" script:
+           #+BEGIN_SRC sh
+             cd $GTS_HOME
+             ant all
+           #+END_SRC
+  9. [X] Initialize the SQL Database Tables
+     #+BEGIN_SRC sh
+        cd $GTS_HOME
+        bin/initdb.sh -rootUser=root
+     #+END_SRC
+     - Database created: gts
+     - Privileges granted to user: gts
+     - Tables
+       ---------------------
+       Table 'Account'
+       Table 'AccountString'
+       Table 'User'
+       Table 'UserAcl'
+       Table 'GroupList'
+       Table 'Device'
+       Table 'Transport'
+       Table 'UniqueXID'
+       Table 'DeviceGroup'
+       Table 'DeviceList'
+       Table 'Driver'
+       Table 'EventData'
+       Table 'Geozone'
+       Table 'Resource'
+       Table 'Role'
+       Table 'RoleAcl'
+       Table 'StatusCode'
+       Table 'SystemProps'
+       Table 'EventTemplate'
+       Table 'PendingPacket'
+       Table 'Property'
+       Table 'Diagnostic'
+  10. [X] Test the installation
+      #+BEGIN_SRC sh
+        bin/checkInstall.sh
+      #+END_SRC
+  11. [ ] Load the sample data
+      #+BEGIN_SRC sh
+      #+END_SRC
+  12. [ ] Create the sysadmin account
+      #+BEGIN_SRC sh
+         bin/admin.sh Account -account=sysadmin -pass=password -create
+      #+END_SRC
+  13. [X] Install track.war
+      1. [X] Build
+         #+BEGIN_SRC sh
+           cd $GTS_HOME && ant track
+         #+END_SRC
+      2. [X] Copy
+         #+BEGIN_SRC sh
+           cp -v build/track.war $CATALINA_HOME/webapps
+         #+END_SRC
+  14. [ ] Install events.war Java servlet
+      1. [ ] Compile events.war" Java servlet
+         #+BEGIN_SRC sh
+           cd $GTS_HOME && ant events
+         #+END_SRC
+      2. [ ] Install events.war
+         #+BEGIN_SRC sh
+           sudo cp -v build/events.war $CATALINA_HOME/webapps
+         #+END_SRC
+      3. [ ] Test the installation
+         #+BEGIN_SRC sh
+             wget 'http://localhost:8080/events/data.json?a=demo&p=&d=demo'
+         #+END_SRC
+  15. [ ] Create a device communication server
+      1. [ ] build the gpmrc servlet
+         #+BEGIN_SRC sh
+           ant gprmc
+         #+END_SRC
+      2. [ ] install gprmc.war
+         #+BEGIN_SRC sh
+           sudo cp -v build/gprmc.war $CATALINA_HOME/webapps           
+         #+END_SRC
+  16. [ ] Send test data
+      #+BEGIN_SRC sh :tangle doit.sh
+        set -o nounset
+        set -o verbose
+        set -o errexit
+        HOSTNAME=71.104.3.13
+        PORT=8080
+        ACCT="demo"
+        ACCT="troy"
+        DEVICE="demo"
+        DEVICE="tc"
+        LAT="3411.0000"
+        LONG="11771.9722"
+        
+        DATA_PATH="http://${HOSTNAME}:${PORT}/gprmc/Data?"
+        STRING="acct=${ACCT}&dev=${DEVICE}&gprmc=\$GPRMC,211846,A,${LAT},N,${LONG},W,000.0,000.0,,*5"
+        
+        URL="${DATA_PATH}${STRING}"
+        echo ${URL}
+        date
+        wget --post-data ${STRING} \
+            ${DATA_PATH}
+        
+        
+            # wget --save-cookies cookies.txt \
+            #                     --post-data 'user=foo&password=bar' \
+            #                     http://server.com/auth.php
+      #+END_SRC
+* Testing
+** Send a data value with http client:
+   #+BEGIN_SRC sh :tangle doit2.sh
+     #!/bin/bash
+     set -o nounset
+     set -o verbose
+     set -o errexit
+     HOSTNAME=71.104.3.13
+     DATA_URL="http://${HOSTNAME}:8080/gprmc/Data?"
+     DATA_STRING='acct=demo&dev=demo&gprmc=$GPRMC,222820,A,3128.7540,N,14257.6714,W,000.0,000.0,271213,,*c'
+     
+     # wget 'http://71.104.3.13:8080/gprmc/Data?acct=demo&dev=demo&gprmc=$GPRMC,222820,A,3128.7540,N,14257.6714,W,000.0,000.0,271213,,*c'
+     wget ${DATA_URL}${DATA_STRING}
+   #+END_SRC
+** Wget
+   #+BEGIN_SRC sh :tangle doit3.sh
+     wget 'http://71.104.3.13:8080/gprmc/Data?acct=troy&dev=tc&gprmc=$GPRMC,182840,A,3128.7540N,14257.6714,W,000.0,000.0,090114,,*a'
+   #+END_SRC
+* Log Thursday, January 9, 2013
+  1. Log in as Account=demo, User="", Password=""
+     1. Mapping -> Vehicle Map
+     2. 
+** Task: Create Prestige Account
+   1. Log in as sysadmin
+   2. System Admin -> System Accounts
+   3. Create a new Account
+      1. Account ID: prestige
+      2. Edit
+         1. Account Description: Prestige Transportation
+         2. password: prestige
+         3. phone: 909-941-8075
+   4. Add new user: troy / troy
+* NMEA
+  http://www.gpsinformation.org/dale/nmea.htm#nmea
+
+  $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+
+Where:
+     RMC          Recommended Minimum sentence C
+     123519       Fix taken at 12:35:19 UTC
+     A            Status A=active or V=Void.
+     4807.038,N   Latitude 48 deg 07.038' N
+     01131.000,E  Longitude 11 deg 31.000' E
+     022.4        Speed over the ground in knots
+     084.4        Track angle in degrees True
+     230394       Date - 23rd of March 1994
+     003.1,W      Magnetic Variation
+     *6A          The checksum data, always begins with *
+
+         
+        $GPRMC,222820,A,3128.7540,N,14257.6714,W,000.0,000.0,271213,,*c";
+
+        "http://71.104.3.13:8080/gprmc/Data?" +
+        "acct=prestige&dev=town_and_country&gprmc=$GPRMC,222820,A,3128.7540,N,14257.6714,W,000.0,000.0,271213,,*c";
+
+* Android NMEA
+** [[http://developer.android.com/reference/android/location/GpsStatus.NmeaListener.html][GpsStatus.NmeaListener]]
+   [[http://developer.android.com/reference/android/location/LocationManager.html#addNmeaListener(android.location.GpsStatus.NmeaListener)][addNmeaListener]]
+* Existing NMEA code from OpenGTSClient.java
+  #+BEGIN_SRC java :tangle /tmp/g.java
+    /*
+    ,*    This file is part of GPSLogger for Android.
+    ,*
+    ,*    GPSLogger for Android is free software: you can redistribute it and/or modify
+    ,*    it under the terms of the GNU General Public License as published by
+    ,*    the Free Software Foundation, either version 2 of the License, or
+    ,*    (at your option) any later version.
+    ,*
+    ,*    GPSLogger for Android is distributed in the hope that it will be useful,
+    ,*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ,*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ,*    GNU General Public License for more details.
+    ,*
+    ,*    You should have received a copy of the GNU General Public License
+    ,*    along with GPSLogger for Android.  If not, see <http://www.gnu.org/licenses/>.
+    ,*/
+    
+    package com.mendhak.gpslogger.common;
+    
+    import android.content.Context;
+    import android.location.Location;
+    import com.loopj.android.http.AsyncHttpClient;
+    import com.loopj.android.http.AsyncHttpResponseHandler;
+    import com.loopj.android.http.RequestParams;
+    
+    import java.text.DecimalFormat;
+    import java.text.DecimalFormatSymbols;
+    import java.text.SimpleDateFormat;
+    import java.util.Date;
+    import java.util.Locale;
+    import java.util.TimeZone;
+    
+    
+    /**
+     ,* OpenGTS Client
+     ,*
+     ,* @author Francisco Reynoso <franole @ gmail.com>
+     ,*/
+    public class OpenGTSClient
+    {
+    
+        private Context applicationContext;
+        private IActionListener callback;
+        private String server;
+        private Integer port;
+        private String path;
+        private AsyncHttpClient httpClient;
+        private int locationsCount = 0;
+        private int sentLocationsCount = 0;
+    
+    
+        public OpenGTSClient(String server, Integer port, String path, IActionListener callback, Context applicationContext)
+        {
+            this.server = server;
+            this.port = port;
+            this.path = path;
+            this.callback = callback;
+            this.applicationContext = applicationContext;
+        }
+    
+        public void sendHTTP(String id, Location location)
+        {
+            sendHTTP(id, new Location[]{location});
+        }
+    
+        /**
+         ,* Send locations sing HTTP GET request to the server
+         ,* <p/>
+         ,* See <a href="http://opengts.sourceforge.net/OpenGTS_Config.pdf">OpenGTS_Config.pdf</a>
+         ,* section 9.1.2 Default "gprmc" Configuration
+         ,*
+         ,* @param id        id of the device
+         ,* @param locations locations
+         ,*/
+    
+        public void sendHTTP(String id, Location[] locations)
+        {
+            try
+            {
+                locationsCount = locations.length;
+                StringBuilder url = new StringBuilder();
+                url.append("http://");
+                url.append(getURL());
+    
+                httpClient = new AsyncHttpClient();
+    
+                for (Location loc : locations)
+                {
+                    RequestParams params = new RequestParams();
+                    params.put("id", id);
+                    params.put("code", "0xF020");
+                    params.put("gprmc", OpenGTSClient.GPRMCEncode(loc));
+                    params.put("alt", String.valueOf(loc.getAltitude()));
+    
+    
+                    Utilities.LogDebug("Sending URL " + url + " with params " + params.toString());
+                    httpClient.get(applicationContext, url.toString(), params, new MyAsyncHttpResponseHandler(this));
+                }
+            }
+            catch (Exception e)
+            {
+                Utilities.LogError("OpenGTSClient.sendHTTP", e);
+                OnFailure();
+            }
+        }
+    
+        public void sendRAW(String id, Location location)
+        {
+            // TODO
+        }
+    
+        private void sendRAW(String id, Location[] locations)
+        {
+            // TODO
+        }
+    
+        private String getURL()
+        {
+            StringBuilder url = new StringBuilder();
+            url.append(server);
+            if (port != null)
+            {
+                url.append(":");
+                url.append(port);
+            }
+            if (path != null)
+            {
+                url.append(path);
+            }
+            return url.toString();
+        }
+    
+    
+        private class MyAsyncHttpResponseHandler extends AsyncHttpResponseHandler
+        {
+            private OpenGTSClient callback;
+    
+            public MyAsyncHttpResponseHandler(OpenGTSClient callback)
+            {
+                super();
+                this.callback = callback;
+            }
+    
+            @Override
+            public void onSuccess(String response)
+            {
+                Utilities.LogInfo("Response Success :" + response);
+                callback.OnCompleteLocation();
+            }
+    
+            @Override
+            public void onFailure(Throwable e, String response)
+            {
+                Utilities.LogError("OnCompleteLocation.MyAsyncHttpResponseHandler Failure with response :" + response, new Exception(e));
+                callback.OnFailure();
+            }
+        }
+    
+        public void OnCompleteLocation()
+        {
+            sentLocationsCount += 1;
+            Utilities.LogDebug("Sent locations count: " + sentLocationsCount + "/" + locationsCount);
+            if (locationsCount == sentLocationsCount)
+            {
+                OnComplete();
+            }
+        }
+    
+        public void OnComplete()
+        {
+            callback.OnComplete();
+        }
+    
+        public void OnFailure()
+        {
+            httpClient.cancelRequests(applicationContext, true);
+            callback.OnFailure();
+        }
+    
+        /**
+         ,* Encode a location as GPRMC string data.
+         ,* <p/>
+         ,* For details check org.opengts.util.Nmea0183#_parse_GPRMC(String)
+         ,* (OpenGTS source)
+         ,*
+         ,* @param loc location
+         ,* @return GPRMC data
+         ,*/
+        public static String GPRMCEncode(Location loc)
+        {
+            DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
+            DecimalFormat f = new DecimalFormat("0.000000", dfs);
+    
+            String gprmc = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,,",
+                    "$GPRMC",
+                    NMEAGPRMCTime(new Date(loc.getTime())),
+                    "A",
+                    NMEAGPRMCCoord(Math.abs(loc.getLatitude())),
+                    (loc.getLatitude() >= 0) ? "N" : "S",
+                    NMEAGPRMCCoord(Math.abs(loc.getLongitude())),
+                    (loc.getLongitude() >= 0) ? "E" : "W",
+                    f.format(MetersPerSecondToKnots(loc.getSpeed())),
+                    f.format(loc.getBearing()),
+                    NMEAGPRMCDate(new Date(loc.getTime()))
+            );
+    
+            gprmc += "*" + NMEACheckSum(gprmc);
+    
+            return gprmc;
+        }
+    
+        public static String NMEAGPRMCTime(Date dateToFormat)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat("HHmmss.SSS");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return sdf.format(dateToFormat);
+        }
+    
+        public static String NMEAGPRMCDate(Date dateToFormat)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return sdf.format(dateToFormat);
+        }
+    
+        public static String NMEAGPRMCCoord(double coord)
+        {
+            // “DDDMM.MMMMM”
+            int degrees = (int) coord;
+            double minutes = (coord - degrees) * 60;
+    
+            DecimalFormat df = new DecimalFormat("00.00000", new DecimalFormatSymbols(Locale.US));
+            StringBuilder rCoord = new StringBuilder();
+            rCoord.append(degrees);
+            rCoord.append(df.format(minutes));
+    
+            return rCoord.toString();
+        }
+    
+    
+        public static String NMEACheckSum(String msg)
+        {
+            int chk = 0;
+            for (int i = 1; i < msg.length(); i++)
+            {
+                chk ^= msg.charAt(i);
+            }
+            String chk_s = Integer.toHexString(chk).toUpperCase();
+            while (chk_s.length() < 2)
+            {
+                chk_s = "0" + chk_s;
+            }
+            return chk_s;
+        }
+    
+        /**
+         ,* Converts given meters/second to nautical mile/hour.
+         ,*
+         ,* @param mps meters per second
+         ,* @return knots
+         ,*/
+        public static double MetersPerSecondToKnots(double mps)
+        {
+            // Google "meters per second to knots"
+            return mps * 1.94384449;
+        }
+    
+    }
+    
+  #+END_SRC
+  
