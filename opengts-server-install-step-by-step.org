@@ -233,6 +233,10 @@
     - Account :: prestige
     - User :: (blank)
     - Password :: prestige
+*** audries
+    - Account :: audries
+    - User :: (blank)
+    - Password :: audries
 ***  select accountID, password from Account;     
 * LINKS
   - [[http://localhost:8080][http://localhost:8080]]
