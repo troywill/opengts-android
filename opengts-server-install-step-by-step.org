@@ -73,7 +73,7 @@
         #+BEGIN_SRC sh :tangle install-opengts.sh :shebang #!/usr/bin/bash
           set -o errexit
           set -o nounset
-          VERSION="2.5.3"
+          VERSION="2.5.4"
           # Download OpenGTS_${VERSION}.zip from http://sourceforge.net/projects/opengts/?source=dlp
           USER="troy"
           GROUP="users"
@@ -83,7 +83,7 @@
           sudo chown --recursive $USER:$GROUP OpenGTS_${VERSION}
         #+END_SRC
      2. [ ] Set the Environment Variables
-	+ Edit add followin lines to /etc/profile:
+	+ Edit add following lines to /etc/profile:
         #+BEGIN_SRC sh
         # The Java JDK (NOT the JRE) installation directory.
         export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
@@ -92,7 +92,7 @@
         # The Apache Tomcat installation directory.
         export CATALINA_HOME=/usr/share/tomcat7
         # The OpenGTS installation directory.
-        export GTS_HOME=/usr/local/OpenGTS_2.5.3
+        export GTS_HOME=/usr/local/OpenGTS_2.5.4
         #+END_SRC
      3. [ ] Symbolic Links
         #+BEGIN_SRC sh :tangle make-links.sh :shebang #!/bin/bash
@@ -102,13 +102,13 @@
           JAVA_HOME="/usr/lib/jvm/java-7-openjdk"
           ANT_HOME="/usr/share/apache-ant"
           CATALINA_HOME="/usr/share/tomcat7"
-          GTS_HOME="/usr/local/OpenGTS_2.5.3"
+          GTS_HOME="/usr/local/OpenGTS_2.5.4"
           
           cd /usr/local
           
           ln -sv $JAVA_HOME java
           ln -sv $CATALINA_HOME tomcat
-          ln -sv $GTS_HOME gts
+          ln -sfv $GTS_HOME gts
         #+END_SRC
      4. [ ] Compile the Supporting GTS Library Files.
         1. [ ] 'cd' into the OpenGTS installation directory and
@@ -153,7 +153,7 @@
      #+BEGIN_SRC sh
        bin/checkInstall.sh
      #+END_SRC
-  10. [ ] Load the sample data
+  10. [ ] (optional) Load the sample data
       #+BEGIN_SRC sh
       #+END_SRC
   11. [ ] Create the sysadmin account
