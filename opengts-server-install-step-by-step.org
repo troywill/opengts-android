@@ -1,8 +1,7 @@
-* [/] Step by step installation OpenGTS documentation recommendations June 8, 2014
-  1. [ ] [[https://wiki.archlinux.org/index.php/java][install Java]]
-     #+BEGIN_SRC sh
-       sudo pacman --sync jre7-openjdk
-     #+END_SRC
+* [0/15] Step by step installation OpenGTS documentation recommendations June 8, 2014
+  1. [-] [[https://wiki.archlinux.org/index.php/java][install Java]]
+     1. [X] Go to http://www.oracle.com/technetwork/java/javase/downloads/index.html
+     2. [ ] Download jdk-7u60-linux-i586.tar.gz
   2. [ ] Install Java Mail
      1. [ ] Skim https://java.net/projects/javamail/pages/Home
      2. [ ] Download javax.mail-1.5.1.jar
@@ -17,7 +16,11 @@
           JAVA_HOME="/usr/lib/jvm/java-7-openjdk/"
           sudo cp -v javax.mail-1.5.1.jar $JAVA_HOME/jre/lib/ext/
 	#+END_SRC
-  3. [ ] start mysql daemon
+  3. [ ] start mysql daemon and enable mysql run at boot time
+     #+BEGIN_SRC sh
+       SERVICE="mysqld"
+       systemctl enable $SERVICE && systemctl start $SERVICE
+     #+END_SRC
      sudo systemctl start mysqld
   4. [ ] Install JDBC
      1. [ ] Skim https://wiki.archlinux.org/index.php/JDBC_and_MySQL#Installing_JDBC
@@ -35,15 +38,20 @@
      #+BEGIN_SRC sh
        sudo pacman --sync apache-ant
      #+END_SRC
-  6. [-] Install Apache "Tomcat"
-     1. [ ] see https://wiki.archlinux.org/index.php/Tomcat
-     2. [ ] install
+  6. [ ] Install Apache "Tomcat"
+     1. [ ] Go to http://tomcat.apache.org
+     2. [ ] Download
+	#+BEGIN_SRC sh
+	  wget http://mirrors.koehn.com/apache/tomcat/tomcat-7/v7.0.54/bin/apache-tomcat-7.0.54.tar.gz
+	#+END_SRC
+     3. [ ] see https://wiki.archlinux.org/index.php/Tomcat
+     4. [ ] install
         #+BEGIN_SRC sh
           sudo pacman --sync tomcat7
         #+END_SRC
-     3. [ ] sudo ln -sv /usr/share/tomcat7/ tomcat
-     4. [ ] sudo systemctl start tomcat7
-     5. [ ] test
+     5. [ ] sudo ln -sv /usr/share/tomcat7/ tomcat
+     6. [ ] sudo systemctl start tomcat7
+     7. [ ] test
         1. [ ] save TestMysql.java file
            #+BEGIN_SRC java :tangle TestMysql.java
              public class TestMysql {
