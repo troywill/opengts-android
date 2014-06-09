@@ -812,36 +812,36 @@ Where:
   1. sudo journalctl -f
 * OPENGTS BUGS
 ** SEVERE: Servlet.service() for servlet [Data] in context with path [/gprmc] threw exception
-Jun 07 18:26:52 kangaroo jsvc.exec[203]: [INFO_|06/07 18:26:52|Data.logInfo:1517] gprmc: [192.168.1.1] GET: http://71.104.3.13:8080/gprmc/Data acct=audries&dev=7&gprmc=$GPRMC,012652.535,A,3404.93158,N,11743.33464,W,0.000000,0.000000,080614,,*18
-Jun 07 18:26:52 kangaroo jsvc.exec[203]: [INFO_|06/07 18:26:52|Transport.loadDeviceByTransportID:1666] Located Device 'audries/7' (using default Device transport)
-Jun 07 18:26:52 kangaroo jsvc.exec[203]: Jun 07, 2014 6:26:52 PM org.apache.catalina.core.StandardWrapperValve invoke
-                                         SEVERE: Servlet.service() for servlet [Data] in context with path [/gprmc] threw exception
-                                         java.lang.NullPointerException
-                                                 at org.opengts.war.gprmc.Data._doWork(Data.java:1017)
-                                                 at org.opengts.war.gprmc.Data.doGet(Data.java:874)
-                                                 at javax.servlet.http.HttpServlet.service(HttpServlet.java:620)
-                                                 at javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
-                                                 at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)
-                                                 at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
-                                                 at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
-                                                 at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
-                                                 at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
-                                                 at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)
-                                                 at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)
-                                                 at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:501)
-                                                 at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:171)
-                                                 at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
-                                                 at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:950)
-                                                 at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)
-                                                 at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:408)
-                                                 at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1040)
-                                                 at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:607)
-                                                 at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:314)
-                                                 at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
-                                                 at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
-                                                 at org.apache.tomc
-                                                 at.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
-                                                 at java.lang.Thread.run(Thread.java:744)
+jsvc.exec[203]: [INFO_|06/07 18:26:52|Data.logInfo:1517] gprmc: [192.168.1.1] GET: http://71.104.3.13:8080/gprmc/Data acct=audries&dev=7&gprmc=$GPRMC,012652.535,A,3404.93158,N,11743.33464,W,0.000000,0.000000,080614,,*18
+jsvc.exec[203]: [INFO_|06/07 18:26:52|Transport.loadDeviceByTransportID:1666] Located Device 'audries/7' (using default Device transport)
+jsvc.exec[203]: Jun 07, 2014 6:26:52 PM org.apache.catalina.core.StandardWrapperValve invoke
+                SEVERE: Servlet.service() for servlet [Data] in context with path [/gprmc] threw exception
+                java.lang.NullPointerException
+                        at org.opengts.war.gprmc.Data._doWork(Data.java:1017)
+                        at org.opengts.war.gprmc.Data.doGet(Data.java:874)
+                        at javax.servlet.http.HttpServlet.service(HttpServlet.java:620)
+                        at javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
+                        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)
+                        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+                        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+                        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+                        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+                        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)
+                        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)
+                        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:501)
+                        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:171)
+                        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+                        at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:950)
+                        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)
+                        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:408)
+                        at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1040)
+                        at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:607)
+                        at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:314)
+                        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+                        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+                        at org.apache.tomc
+                        at.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+                        at java.lang.Thread.run(Thread.java:744)
 ** at org.opengts.war.gprmc.Data._doWork(Data.java:1017)
    - file:/usr/local/OpenGTS_2.5.5/src/org/opengts/war/gprmc/Data.java
 ** at org.opengts.war.gprmc.Data.doGet(Data.java:874)
