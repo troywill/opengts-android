@@ -153,49 +153,13 @@
          #+BEGIN_SRC sh
            sudo cp -v build/gprmc.war $CATALINA_HOME/webapps           
          #+END_SRC
-  15. [ ] Send test data
-      #+BEGIN_SRC sh :tangle bin/send-test-data
-        set -o nounset
-        set -o verbose
-        set -o errexit
-        HOSTNAME=71.104.3.13
-        PORT=8080
-        ACCT="demo"
-        ACCT="troy"
-        DEVICE="demo"
-        DEVICE="tc"
-        LAT="3411.0000"
-        LONG="11771.9722"
-        
-        DATA_PATH="http://${HOSTNAME}:${PORT}/gprmc/Data?"
-        STRING="acct=${ACCT}&dev=${DEVICE}&gprmc=\$GPRMC,211846,A,${LAT},N,${LONG},W,000.0,000.0,,*5"
-        
-        URL="${DATA_PATH}${STRING}"
-        echo ${URL}
-        date
-        wget --post-data ${STRING} \
-            ${DATA_PATH}
-        
-        
-            # wget --save-cookies cookies.txt \
-            #                     --post-data 'user=foo&password=bar' \
-            #                     http://server.com/auth.php
-      #+END_SRC
 * LOGIN
 ** [[http://localhost:8080/track/Track]]
 *** sysadmin
     - Account :: sysadmin
     - User :: (blank)
     - Password :: password
-*** prestige
-    - Account :: prestige
-    - User :: (blank)
-    - Password :: prestige
-*** audries
-    - Account :: audries
-    - User :: (blank)
-    - Password :: audries
-***  select accountID, password from Account;     
+*** select accountID, password from Account;     
 * LINKS
   - [[http://localhost:8080][http://localhost:8080]]
   - [[http://localhost:8080/track/Track]]
@@ -220,20 +184,6 @@
    #+BEGIN_SRC sh :tangle doit3.sh
      wget 'http://71.104.3.13:8080/gprmc/Data?acct=troy&dev=tc&gprmc=$GPRMC,182840,A,3128.7540N,14257.6714,W,000.0,000.0,090114,,*a'
    #+END_SRC
-* Log Thursday, January 9, 2013
-  1. Log in as Account=demo, User="", Password=""
-     1. Mapping -> Vehicle Map
-     2. 
-** Task: Create Prestige Account
-   1. Log in as sysadmin
-   2. System Admin -> System Accounts
-   3. Create a new Account
-      1. Account ID: prestige
-      2. Edit
-         1. Account Description: Prestige Transportation
-         2. password: prestige
-         3. phone: 909-941-8075
-   4. Add new user: troy / troy
 * DEBUGGING
   1. sudo journalctl -f
 * OPENGTS BUGS
