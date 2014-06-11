@@ -1,61 +1,37 @@
-* [/] Step by step installation OpenGTS documentation recommendations June 11, 2014 
+* [12/15] Step by step installation OpenGTS documentation recommendations June 11, 2014 
   1. [-] Install Apache Tomcat
      1. [ ] Skim https://wiki.archlinux.org/index.php/Tomcat
      2. [ ] install tomcat7 package
         #+BEGIN_SRC sh
           sudo pacman --sync tomcat7
         #+END_SRC
-     3. [ ] sudo ln -sv /usr/share/tomcat7/ tomcat
-     4. [ ] sudo systemctl start tomcat7
-     5. [ ] sudo systemctl enable tomcat7
-     6. [-] test
-        1. [ ] save TestMysql.java file
-           #+BEGIN_SRC java :tangle TestMysql.java
-             public class TestMysql {
-                 public static void main(String[] args) {
-                     try {
-                         Class.forName("com.mysql.jdbc.Driver").newInstance();
-                     } catch (Exception e) {
-                         System.out.println("The driver couldn't be loaded");
-                         return;
-                     }
-                     System.out.println("The driver was loaded");
-                 }
-             }
-           #+END_SRC
-        2. [ ] compile the file
-           #+BEGIN_SRC sh
-             javac TestMysql.java
-           #+END_SRC
-        3. [ ] Run the file
-           #+BEGIN_SRC sh :tangle run-TestMysql.sh :shebang #!/bin/sh
-             # CLASSPATH=/usr/lib/jvm/java-7-openjdk/jre/lib/ext
-             CLASSPATH=/usr/lib/jvm/java-7-openjdk/jre/lib/ext
-             java -classpath :${CLASSPATH} TestMysql
-           #+END_SRC
-  2. [ ] [[https://wiki.archlinux.org/index.php/java][install Java]]
+	- Packages (10): ca-certificates-java-20140324-2  eclipse-ecj-4.3.1-1  java-commons-daemon-1.0.15-1  java-jsvc-1.0.15-1  jre7-openjdk-7.u55_2.4.7-1 jre7-openjdk-headless-7.u55_2.4.7-1  nss-3.16.1-1  xdg-utils-1.1.0.git20140426-1  xorg-xset-1.2.3-1  tomcat7-7.0.54-1
+     3. [ ] sudo systemctl start tomcat7
+     4. [ ] sudo systemctl enable tomcat7
+     5. [ ] Test that tomcat is running by viewing http://localhost:8080/ in a web browser
+  2. [ ] start and enable mysql daemon
      #+BEGIN_SRC sh
-       sudo pacman --sync jre7-openjdk
+       # sudo pacman --sync mariadb
+       sudo systemctl start mysqld
+       sudo systemctl enable mysqld
      #+END_SRC
-  3. [ ] start mysql daemon
-     sudo systemctl start mysqld
-  4. [ ] Install apache ant
+  3. [ ] Install apache ant
      #+BEGIN_SRC sh
        sudo pacman --sync apache-ant
      #+END_SRC
-  5. [-] Install JDBC
+     - Packages (2): jdk7-openjdk-7.u55_2.4.7-1  apache-ant-1.9.4-1
+  4. [ ] Install JDBC
      1. [ ] Skim https://wiki.archlinux.org/index.php/JDBC_and_MySQL#Installing_JDBC
      2. [ ] wget https://aur.archlinux.org/packages/my/mysql-jdbc/mysql-jdbc.tar.gz
-     3. [ ] untar mysql-jdbc.tar.gz and descend into mysql-jdbc
-     4. [ ] makepkg --syncdeps
+     3. [ ] descend into AUR/mysql-jdbc
+     4. [ ] makepkg
      5. [ ] sudo pacman --upgrade mysql-jdbc-5.1.31-1-i686.pkg.tar.xz
-     6. [ ] copy 
-	#+BEGIN_SRC sh :tangle copy-mysql-connector.sh :shebang #!/bin/sh
-          sudo cp -iv /usr/share/java/mysql-jdbc/mysql-connector-java-5.1.29-bin.jar \
+     6. [ ] copy mysql-connector-java-5.1.31-bin.jar to /usr/lib/jvm/java-7-openjdk/jre/lib/ext/
+	#+BEGIN_SRC sh :tangle bin/copy-mysql-connector.sh :shebang #!/bin/sh
+          sudo cp -iv /usr/share/java/mysql-jdbc/mysql-connector-java-5.1.31-bin.jar \
               /usr/lib/jvm/java-7-openjdk/jre/lib/ext/
 	#+END_SRC
-	sudo cp -iv /usr/share/java/mysql-jdbc/mysql-connector-java-5.1.27-bin.jar /usr/lib/jvm/java-7-openjdk/jre/lib/ext/
-  6. [ ] Install Java Mail
+  5. [ ] Install Java Mail
      1. [ ] Skim https://java.net/projects/javamail/pages/Home
      2. [ ] Download javax.mail-1.5.1.jar
 	#+BEGIN_SRC sh :tangle download-javax.mail.sh :shebang #!/bin/sh
@@ -69,9 +45,10 @@
           JAVA_HOME="/usr/lib/jvm/java-7-openjdk/"
           sudo cp -v javax.mail-1.5.1.jar $JAVA_HOME/jre/lib/ext/
 	#+END_SRC
-  7. [ ] Install the OpenGTS Source
-     1. [ ] install opengts
-        #+BEGIN_SRC sh :tangle install-opengts.sh :shebang #!/usr/bin/bash
+  6. [ ] Download and install the OpenGTS source
+     1. [ ] Download OpenGTS_2.5.3.zip to ~/Downloads
+     2. [ ] install opengts
+        #+BEGIN_SRC sh :tangle bin/install-opengts.sh :shebang #!/usr/bin/bash
           set -o errexit
           set -o nounset
           VERSION="2.5.3"
@@ -83,7 +60,7 @@
           sudo unzip $ZIP_FILE
           sudo chown --recursive $USER:$GROUP OpenGTS_${VERSION}
         #+END_SRC
-     2. [ ] Set the Environment Variables
+     3. [ ] Set the Environment Variables
 	+ Edit add following lines to /etc/profile:
         #+BEGIN_SRC sh
         # The Java JDK (NOT the JRE) installation directory.
@@ -95,10 +72,11 @@
         # The OpenGTS installation directory.
         export GTS_HOME=/usr/local/OpenGTS_2.5.3
         #+END_SRC
-     3. [ ] Make symbolic links
-        #+BEGIN_SRC sh :tangle make-links.sh :shebang #!/bin/bash
+     4. [ ] source /etc/profile
+     5. [ ] Make symbolic links
+        #+BEGIN_SRC sh :tangle bin/make-links.sh :shebang #!/bin/bash
           set -o nounset
-           echo "Run as root"
+          # Run as root
           
           JAVA_HOME="/usr/lib/jvm/java-7-openjdk"
           ANT_HOME="/usr/share/apache-ant"
@@ -111,7 +89,7 @@
           ln -sv $CATALINA_HOME tomcat
           ln -sfv $GTS_HOME gts
         #+END_SRC
-     4. [ ] Compile the Supporting GTS Library Files.
+     6. [ ] Compile the Supporting GTS Library Files.
         1. [ ] 'cd' into the OpenGTS installation directory and
            compile the jar files, and servlet war files, using the
            supplied Ant "build.xml" script:
@@ -119,7 +97,7 @@
              cd $GTS_HOME
              ant all
            #+END_SRC
-  8. [ ] Initialize the SQL Database Tables
+  7. [ ] Initialize the SQL Database Tables
      #+BEGIN_SRC sh
         cd $GTS_HOME
         bin/initdb.sh -rootUser=root
@@ -150,18 +128,22 @@
        Table 'PendingPacket'
        Table 'Property'
        Table 'Diagnostic'
-  9. [ ] Test the installation
+  8. [ ] Test the installation
      #+BEGIN_SRC sh
        bin/checkInstall.sh
      #+END_SRC
-  10. [ ] (optional) Load the sample data
-      #+BEGIN_SRC sh
-      #+END_SRC
-  11. [ ] Create the sysadmin account
+  9. [ ] (optional) Load the sample data
+     #+BEGIN_SRC sh
+     #+END_SRC
+  10. [ ] Create the sysadmin account
       #+BEGIN_SRC sh
          bin/admin.sh Account -account=sysadmin -pass=password -create
       #+END_SRC
-  12. [-] Install track.war
+  11. [ ] Create additional account
+      #+BEGIN_SRC sh
+         bin/admin.sh Account -account=FOO -pass=password -create
+      #+END_SRC
+  12. [ ] Install track.war
       1. [ ] Build
          #+BEGIN_SRC sh
            cd $GTS_HOME && ant track
@@ -170,7 +152,7 @@
          #+BEGIN_SRC sh
            sudo cp -v build/track.war $CATALINA_HOME/webapps
          #+END_SRC
-  13. [-] Install events.war Java servlet
+  13. [ ] Install events.war Java servlet
       1. [ ] Compile events.war" Java servlet
          #+BEGIN_SRC sh
            cd $GTS_HOME && ant events
@@ -197,7 +179,7 @@
            sudo cp -v build/gprmc.war $CATALINA_HOME/webapps           
          #+END_SRC
   15. [ ] Send test data
-      #+BEGIN_SRC sh :tangle doit.sh
+      #+BEGIN_SRC sh :tangle bin/send-test-data
         set -o nounset
         set -o verbose
         set -o errexit
