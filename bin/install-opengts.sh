@@ -2,9 +2,9 @@
 
 set -o errexit
 set -o nounset
-VERSION="2.5.4"
+VERSION="2.5.3"
 # Download OpenGTS_${VERSION}.zip from http://sourceforge.net/projects/opengts/?source=dlp
-USER="troy"
+USER=$USER
 GROUP="users"
 ZIP_FILE=~/Downloads/OpenGTS_${VERSION}.zip
 cd /usr/local
