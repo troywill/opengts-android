@@ -1,6 +1,381 @@
-* Log
-** 2014-03-28
-   + Added Nema Field
+* Introduction
+* [5/5] Run LocationUpdates Step by step
+  1. [X] Download LocationUpdates.zip from android.com and import into Eclipse
+     1. [X] Download LocationUpdates.zip from http://developer.android.com/training/location/retrieve-current.html
+	+ md5sum e3c28cbea2dbcc26f4a31489dbb5c187  LocationUpdates.zip
+     2. [X] Unzip LocationUpdates.zip
+     3. [X] File -> Import -> Android -> Existing Android Code Into Workspace
+	1. [X] New Project Name -> opengts-android
+	2. [X] Copy projects into workspace
+	3. [X] Refactor and rename to opengts-android
+        4. [X] Finish
+  2. [X] Fix "The import com.google.android.gms cannot be resolved" error
+     Note: This error appears in MainActivity.java
+     1. [X] Import google-play-services_lib into workspace
+	1. [X] download the Google Play services SDK from the SDK Manager
+           + ~/Development/adt-bundle-linux-x86-20140321/sdk/extras/google/google_play_services/libproject
+        2. [X] import the library project into your workspace.
+	   1. [X] Click File > Import, select Android > Existing Android Code into Workspace,
+	      + Select ~/Development/adt-bundle-linux-x86-20131030/sdk/extras/google/google_play_services/libproject/google-play-services_lib
+	      + 2014-06-16: Select "Copy projects into workspace"
+	3. [X] Right Click -> Properties -> Android -> Library -> Add -> google-play-services_lib
+	   1. Note: "Open Project" on google-play-services_lib
+  3. [X] Fix "import android.support.v4.app.DialogFragment;"
+     1. [X] Import
+        1. [X] Skim http://developer.android.com/tools/support-library/setup.html
+        2. [X] Skim http://developer.android.com/tools/support-library/setup.html#add-library
+        3. [X] Create a libs/ directory in the root of the application project.
+	   #+BEGIN_SRC sh
+	      cd ~/workspace/opengts-android/ && mkdir libs
+	   #+END_SRC
+        4. [X] Copy the JAR file from your Android SDK installation
+           directory
+           1. [X] Copy android-support-v4.jar
+              #+BEGIN_SRC sh
+                cd ~/workspace/opengts-android/libs
+                cp -v ~/Development/adt-bundle-linux-x86-20140321/sdk/extras/android/support/v4/android-support-v4.jar .
+              #+END_SRC
+           2. [X] Right click the JAR file and select Build Path > Add
+              to Build Path.
+              1. Note: Highlight project and F5 to make lib dir show up
+              2. Note: The error messages in Eclipse ought to disappear.
+  4. [X] Fix program crashing by adding google play services to [[file:~/workspace/opengts-android/AndroidManifest.xml][AndroidManifest.xml]] 
+     1. [X] (Optional,for background information) Skim [[http://developer.android.com/tools/index.html][Developer Tools]]
+     2. [X] (Optional,for background information) Skim [[http://developer.android.com/tools/workflow/index.html][Workflow]]
+     3. [X] (Optional,for background information) Skim [[http://developer.android.com/google/play-services/index.html][Google Play Services]]
+     4. [X] Skim [[http://developer.android.com/google/play-services/setup.html#Setup][Set Up a Project that Uses Google Play Services]]
+	1. [X] Fix play version
+           Place just before closing </application> tag
+           in [[file:~/workspace/opengts-android/AndroidManifest.xml][AndroidManifest.xml]]
+           #+BEGIN_SRC xml
+             <meta-data android:name="com.google.android.gms.version"
+                        android:value="@integer/google_play_services_version" />
+           #+END_SRC
+  5. [X] Run on a real device
+     1. [X] Connect android device, e.g. Nexus 5
+     2. [X] Run
+* [0/1] Add Host preference Step by Step
+  1. [ ] [[http://developer.android.com/reference/android/app/Activity.html#onCreateOptionsMenu(android.view.Menu)][onCreateOptionsMenu]]
+     #+BEGIN_SRC java
+       @Override
+       public boolean onCreateOptionsMenu(Menu menu) {
+           
+           // Inflate the menu; this adds items to the action bar if it is present.
+           getMenuInflater().inflate(R.menu.main, menu);
+           return true;
+       }
+
+       @Override
+       public boolean onOptionsItemSelected(MenuItem item) {
+           // Handle action bar item clicks here. The action bar will
+           // automatically handle clicks on the Home/Up button, so long
+           // as you specify a parent activity in AndroidManifest.xml.
+           int id = item.getItemId();
+           if (id == R.id.action_settings) {
+               return true;
+           }
+           return super.onOptionsItemSelected(item);
+       }
+     #+END_SRC
+  2. [ ] Create menu.xml ( ~/workspace/opengts-android/res/menu/main.xml )
+     #+BEGIN_SRC xml
+       <menu xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools"
+           tools:context="com.example.welcome.MainActivity" >
+
+           <item
+               android:id="@+id/action_settings"
+               android:orderInCategory="100"
+               android:showAsAction="never"
+               android:title="@string/action_settings"/>
+
+       </menu>
+     #+END_SRC
+  3. [ ] Create a preferences.xml ( ~/workspace/opengts-android/res/xml/preferences.xml )
+     #+BEGIN_SRC xml
+       <?xml version="1.0" encoding="utf-8"?>
+       <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+           <ListPreference
+               android:entries="@array/guesses_list"
+               android:entryValues="@array/guesses_list"
+               android:key="pref_numberOfChoices"
+               android:persistent="true"
+               android:summary="@string/number_of_choices_description"
+               android:title="@string/number_of_choices" 
+               android:defaultValue="3"/>
+
+           <MultiSelectListPreference
+               android:entries="@array/regions_list_for_settings"
+               android:entryValues="@array/regions_list"
+               android:key="pref_regionsToInclude"
+               android:persistent="true"
+               android:summary="@string/world_regions_description"
+               android:title="@string/world_regions" 
+               android:defaultValue="@array/regions_list"/>
+
+       </PreferenceScreen>     
+     #+END_SRC
+  4. [ ] arrays.xml
+     #+BEGIN_SRC xml
+       <?xml version="1.0" encoding="utf-8"?>
+       <resources>
+
+           <string-array name="regions_list">
+               <item>Africa</item>
+               <item>Asia</item>
+               <item>Europe</item>
+               <item>North_America</item>
+               <item>Oceania</item>
+               <item>South_America</item>
+           </string-array>
+           <string-array name="regions_list_for_settings">
+               <item>Africa</item>
+               <item>Asia</item>
+               <item>Europe</item>
+               <item>North America</item>
+               <item>Oceania</item>
+               <item>South America</item>
+           </string-array>
+           <string-array name="guesses_list">
+               <item>3</item>
+               <item>6</item>
+               <item>9</item>
+           </string-array>
+
+       </resources>     
+     #+END_SRC
+  5. [ ] See Location 6258 in Deitel
+* [/] Add NMEA code from OpenGTSClient.java Step by step
+  1. [ ] Add following java functions to [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
+     1. [ ] Move cursor to closing parenthesis at the end of [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
+     2. [ ] Insert newline and indent (Ctrl-j)
+     3. [ ] Insert GPRMCEncode functions 
+	#+BEGIN_SRC java :tangle /tmp/GPRMCEncode.java
+          // BEGIN SECTION GPRMC
+          /**
+             ,,* Encode a location as GPRMC string data.
+             ,,* <p/>
+             ,,* For details check org.opengts.util.Nmea0183#_parse_GPRMC(String)
+             ,,* (OpenGTS source)
+             ,,*
+             ,,* @param loc location
+             ,,* @return GPRMC data
+             ,,*/
+          public static String GPRMCEncode(Location loc)
+          {
+              DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
+              DecimalFormat f = new DecimalFormat("0.000000", dfs);
+              
+              String gprmc = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,,",
+                                           "$GPRMC",
+                                           NMEAGPRMCTime(new Date(loc.getTime())),
+                                           "A",
+                                           NMEAGPRMCCoord(Math.abs(loc.getLatitude())),
+                                           (loc.getLatitude() >= 0) ? "N" : "S",
+                                           NMEAGPRMCCoord(Math.abs(loc.getLongitude())),
+                                           (loc.getLongitude() >= 0) ? "E" : "W",
+                                           f.format(MetersPerSecondToKnots(loc.getSpeed())),
+                                           f.format(loc.getBearing()),
+                                           NMEAGPRMCDate(new Date(loc.getTime()))
+                                           );
+              
+              gprmc += "*" + NMEACheckSum(gprmc);
+              
+              return gprmc;
+          }
+              
+          public static String NMEAGPRMCTime(Date dateToFormat)
+          {
+              SimpleDateFormat sdf = new SimpleDateFormat("HHmmss.SSS");
+              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+              return sdf.format(dateToFormat);
+          }
+              
+          public static String NMEAGPRMCDate(Date dateToFormat)
+          {
+              SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+              return sdf.format(dateToFormat);
+          }
+              
+          public static String NMEAGPRMCCoord(double coord)
+          {
+              // “DDDMM.MMMMM”
+              int degrees = (int) coord;
+              double minutes = (coord - degrees) * 60;
+              
+              DecimalFormat df = new DecimalFormat("00.00000", new DecimalFormatSymbols(Locale.US));
+              StringBuilder rCoord = new StringBuilder();
+              rCoord.append(degrees);
+              rCoord.append(df.format(minutes));
+              
+              return rCoord.toString();
+          }
+              
+              
+          public static String NMEACheckSum(String msg)
+          {
+              int chk = 0;
+              for (int i = 1; i < msg.length(); i++)
+                  {
+                      chk ^= msg.charAt(i);
+                  }
+              String chk_s = Integer.toHexString(chk).toUpperCase();
+              while (chk_s.length() < 2)
+                  {
+                      chk_s = "0" + chk_s;
+                  }
+              return chk_s;
+          }
+              
+          /**
+             ,,* Converts given meters/second to nautical mile/hour.
+             ,,*
+             ,,* @param mps meters per second
+             ,,* @return knots
+             ,,*/
+          public static double MetersPerSecondToKnots(double mps)
+          {
+              // Google "meters per second to knots"
+              return mps * 1.94384449;
+          }
+          // END SECTION GPRMC
+        #+END_SRC
+     4. [ ] Verify that program runs
+  2. [ ] Change Latitude/Longitude string to NMEA string
+     1. [ ] Find following spot in [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]] onLocationChanged method
+        #+BEGIN_SRC java
+          // In the UI, set the latitude and longitude to the value received
+          mLatLng.setText(LocationUtils.getLatLng(this, location));
+        #+END_SRC
+     2. [ ] Display the NMEA string
+	#+BEGIN_SRC java
+          // In the UI, set the latitude and longitude to the value received
+          // mLatLng.setText(LocationUtils.getLatLng(this, location));
+          mLatLng.setText(GPRMCEncode(location));
+	#+END_SRC
+  3. [ ] run
+* [ ] Make OpenGTS address a preference
+  1. [/] Define the preference in an XML file
+     1. [ ] file:~/workspace/MyFirstApp/res/xml/preferences.xml 
+	http://developer.android.com/guide/topics/ui/settings.html#Activity
+	#+BEGIN_SRC xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+            
+            <EditTextPreference
+                android:persistent="true"
+                android:defaultValue="+19094479170"
+                android:key="ref_PhoneNumber"
+                android:summary="Enter SMS Phone Number" android:dialogTitle="Enter Phone Number"
+                android:title="Phone Number" />
+          </PreferenceScreen>
+        #+END_SRC
+  2. [ ] file:~/workspace/MyFirstApp/src/com/example/myfirstapp/SettingsFragment.java
+     #+BEGIN_SRC java
+       package com.example.myfirstapp;
+          
+       import android.os.Bundle;
+       import android.preference.PreferenceFragment;
+       import android.widget.Toast;
+          
+       public class SettingsFragment extends PreferenceFragment {
+          
+           @Override
+           public void onCreate(Bundle savedInstanceState)
+           {
+               super.onCreate(savedInstanceState);
+               // Toast.makeText(null, "SettingsActivity.java", Toast.LENGTH_LONG).show();
+               addPreferencesFromResource(R.xml.preferences);
+           }
+       }        
+     #+END_SRC
+  3. [ ] file:~/workspace/MyFirstApp/src/com/example/myfirstapp/SettingsActivity.java
+     #+BEGIN_SRC java
+       package com.example.myfirstapp;
+       
+       import android.app.Activity;
+       import android.os.Bundle;
+       import android.widget.Toast;
+       
+       public class SettingsActivity extends Activity {
+       
+           @Override
+           protected void onCreate(Bundle savedInstanceState)
+           {
+               super.onCreate(savedInstanceState);
+               setContentView(R.layout.activity_settings);
+               //      Toast.makeText(getApplicationContext(), "SettingsActivity.java", Toast.LENGTH_LONG).show();
+           }
+       
+       }
+     #+END_SRC
+  4. [ ] file:~/workspace/MyFirstApp/src/com/example/myfirstapp/MainActivity.java
+     #+BEGIN_SRC java
+       public class MainActivity extends Activity {
+       
+           public static final String PHONE = "pref_PhoneNumber";
+       
+           @Override
+           protected void onCreate(Bundle savedInstanceState) {
+               super.onCreate(savedInstanceState);
+               setContentView(R.layout.activity_main);
+       
+               PreferenceManager.setDefaultValues(this,R.xml.preferences,false);
+       
+               PreferenceManager.getDefaultSharedPreferences(this);
+               //              registerOnSharedPreferencesChangeListener(preferenceChangeListener);
+       
+               if (savedInstanceState == null) {
+                   getFragmentManager().beginTransaction()
+                       .add(R.id.container, new PlaceholderFragment()).commit();
+               }
+           }
+       
+           @Override
+           public boolean onCreateOptionsMenu(Menu menu) {
+       
+               // Inflate the menu; this adds items to the action bar if it is present.
+               getMenuInflater().inflate(R.menu.main, menu);
+               return true;
+           }
+       
+           @Override
+           public boolean onOptionsItemSelected(MenuItem item) {
+               // int id = item.getItemId();
+               // if (id == R.id.action_settings) {
+               //      return true;
+               // }
+       
+               Toast.makeText(getApplicationContext(), "MainActivity.java", Toast.LENGTH_LONG).show();
+       
+               Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+               startActivity(preferencesIntent);
+               return super.onOptionsItemSelected(item);
+           }
+       
+           /**
+            ,* A placeholder fragment containing a simple view.
+            ,*/
+           public static class PlaceholderFragment extends Fragment {
+       
+               public PlaceholderFragment() {
+               }
+       
+               @Override
+               public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                        Bundle savedInstanceState) {
+                   View rootView = inflater.inflate(R.layout.fragment_main, container,
+                                                    false);
+                   return rootView;
+               }
+           }
+       
+       }
+     #+END_SRC
+** Skim [[http://developer.android.com/guide/topics/ui/settings.html]]
+  
 * SUCCESS1
   #+BEGIN_SRC java
     // BEGIN TDW  
@@ -116,171 +491,6 @@
 </RelativeLayout>
   
   #+END_SRC
-  
-* [/] Run LocationUpdates Step by step
-  1. [ ] Download and Import
-     1. [ ] Download LocationUpdates.zip from http://developer.android.com/training/location/retrieve-current.html
-	+ md5sum e3c28cbea2dbcc26f4a31489dbb5c187  LocationUpdates.zip
-     2. [ ] Unzip LocationUpdates.zip
-     3. [ ] Import -> Android -> Existing Android Code Into Workspace
-	1. [ ] New Project Name -> opengts-android
-	2. [ ] Copy projects into workspace
-        3. [ ] Finish
-  2. [ ] Fix "The import com.google.android.gms cannot be resolved" error
-     Note: This error appears in MainActivity.java
-     1. [ ] Import google-play-services_lib into workspace
-	1. [ ] download the Google Play services SDK from the SDK Manager
-           + ~/Development/adt-bundle-linux-x86-20131030/sdk/extras/google/google_play_services/libproject
-        2. [ ] import the library project into your workspace.
-	   1. [ ] Click File > Import, select Android > Existing Android Code into Workspace,
-	      + Select ~/Development/adt-bundle-linux-x86-20131030/sdk/extras/google/google_play_services/libproject/google-play-services_lib
-	3. [ ] Right Click -> Properties -> Android -> Library -> Add -> google-play-services_lib
-	   1. Note: "Open Project" on google-play-services_lib
-  3. [ ] Fix "import android.support.v4.app.DialogFragment;"
-     1. [ ] Import
-        1. [ ] Skim http://developer.android.com/tools/support-library/setup.html
-        2. [ ] Skim http://developer.android.com/tools/support-library/setup.html#add-library
-        3. [ ] Create a libs/ directory in the root of the application project.
-	   #+BEGIN_SRC sh
-	      cd ~/workspace/opengts-android/ && mkdir libs
-	   #+END_SRC
-        4. [ ] Copy the JAR file from your Android SDK installation
-           directory
-           1. [ ] Copy android-support-v4.jar
-              #+BEGIN_SRC sh
-                cd ~/workspace/opengts-android/libs
-                cp -v ~/Development/adt-bundle-linux-x86-20131030/sdk/extras/android/support/v4/android-support-v4.jar .
-              #+END_SRC
-           2. [ ] Right click the JAR file and select Build Path > Add
-              to Build Path.
-              1. Note: Highlight project and F5 to make lib dir show up
-              2. Note: The error messages in Eclipse ought to disappear.
-  4. [ ] Fix program crashing by adding google play services to [[file:~/workspace/opengts-android/AndroidManifest.xml][AndroidManifest.xml]] 
-     1. [ ] (Optional,for background) Skim [[http://developer.android.com/tools/index.html][Developer Tools]]
-     2. [ ] (Optional,for background) Skim [[http://developer.android.com/tools/workflow/index.html][Workflow]]
-     3. [ ] (Optional,for background) Skim [[http://developer.android.com/google/play-services/index.html][Google Play Services]]
-	1. [ ] Skim [[http://developer.android.com/google/play-services/setup.html][Set Up Google Play Services SDK]]
-	   1. [ ] Skim [[http://developer.android.com/google/play-services/setup.html#Setup][Set Up a Project that Uses Google Play Services]]
-	      1. [ ] Fix play version
-                 Place just before closing </application> tag
-                 in [[file:~/workspace/opengts-android/AndroidManifest.xml][AndroidManifest.xml]]
-                 #+BEGIN_SRC xml
-                   <meta-data android:name="com.google.android.gms.version"
-                              android:value="@integer/google_play_services_version" />
-                 #+END_SRC
-  5. [ ] Run on a real device
-     1. [ ] Connect android device, e.g. Nexus 5
-     2. [ ] Run
-* [/] Add NMEA code from OpenGTSClient.java Step by step
-  1. [ ] Add following java functions to [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
-     1. [ ] Move cursor to closing parenthesis at the end of [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
-     2. [ ] Insert newline and indent (Ctrl-j)
-     3. [ ] Insert GPRMCEncode functions 
-	#+BEGIN_SRC java :tangle /tmp/GPRMCEncode.java
-          // BEGIN SECTION GPRMC
-          /**
-             ,,* Encode a location as GPRMC string data.
-             ,,* <p/>
-             ,,* For details check org.opengts.util.Nmea0183#_parse_GPRMC(String)
-             ,,* (OpenGTS source)
-             ,,*
-             ,,* @param loc location
-             ,,* @return GPRMC data
-             ,,*/
-          public static String GPRMCEncode(Location loc)
-          {
-              DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-              DecimalFormat f = new DecimalFormat("0.000000", dfs);
-              
-              String gprmc = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,,",
-                                           "$GPRMC",
-                                           NMEAGPRMCTime(new Date(loc.getTime())),
-                                           "A",
-                                           NMEAGPRMCCoord(Math.abs(loc.getLatitude())),
-                                           (loc.getLatitude() >= 0) ? "N" : "S",
-                                           NMEAGPRMCCoord(Math.abs(loc.getLongitude())),
-                                           (loc.getLongitude() >= 0) ? "E" : "W",
-                                           f.format(MetersPerSecondToKnots(loc.getSpeed())),
-                                           f.format(loc.getBearing()),
-                                           NMEAGPRMCDate(new Date(loc.getTime()))
-                                           );
-              
-              gprmc += "*" + NMEACheckSum(gprmc);
-              
-              return gprmc;
-          }
-              
-          public static String NMEAGPRMCTime(Date dateToFormat)
-          {
-              SimpleDateFormat sdf = new SimpleDateFormat("HHmmss.SSS");
-              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-              return sdf.format(dateToFormat);
-          }
-              
-          public static String NMEAGPRMCDate(Date dateToFormat)
-          {
-              SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
-              sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-              return sdf.format(dateToFormat);
-          }
-              
-          public static String NMEAGPRMCCoord(double coord)
-          {
-              // “DDDMM.MMMMM”
-              int degrees = (int) coord;
-              double minutes = (coord - degrees) * 60;
-              
-              DecimalFormat df = new DecimalFormat("00.00000", new DecimalFormatSymbols(Locale.US));
-              StringBuilder rCoord = new StringBuilder();
-              rCoord.append(degrees);
-              rCoord.append(df.format(minutes));
-              
-              return rCoord.toString();
-          }
-              
-              
-          public static String NMEACheckSum(String msg)
-          {
-              int chk = 0;
-              for (int i = 1; i < msg.length(); i++)
-                  {
-                      chk ^= msg.charAt(i);
-                  }
-              String chk_s = Integer.toHexString(chk).toUpperCase();
-              while (chk_s.length() < 2)
-                  {
-                      chk_s = "0" + chk_s;
-                  }
-              return chk_s;
-          }
-              
-          /**
-             ,,* Converts given meters/second to nautical mile/hour.
-             ,,*
-             ,,* @param mps meters per second
-             ,,* @return knots
-             ,,*/
-          public static double MetersPerSecondToKnots(double mps)
-          {
-              // Google "meters per second to knots"
-              return mps * 1.94384449;
-          }
-          // END SECTION GPRMC
-        #+END_SRC
-     4. [ ] Verify that program runs
-  2. [ ] Change Latitude/Longitude string to NMEA string
-     1. [ ] Find following spot in [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
-        #+BEGIN_SRC java
-          // In the UI, set the latitude and longitude to the value received
-          mLatLng.setText(LocationUtils.getLatLng(this, location));
-        #+END_SRC
-     2. [ ] 
-	#+BEGIN_SRC java
-          // In the UI, set the latitude and longitude to the value received
-          // mLatLng.setText(LocationUtils.getLatLng(this, location));
-          mLatLng.setText(GPRMCEncode(location));
-	#+END_SRC
-  3. [ ] run
 * [/] Send HTTP get request with NMEA string
 ** What we need to do
    http://71.104.3.13:8080/gprmc/Data?acct=troy&dev=tc&gprmc=$GPRMC,182840,A,3128.7540N,14257.6714,W,000.0,000.0,090114,,*a
@@ -310,7 +520,6 @@ Where:
 * Android NMEA
 ** [[http://developer.android.com/reference/android/location/GpsStatus.NmeaListener.html][GpsStatus.NmeaListener]]
    [[http://developer.android.com/reference/android/location/LocationManager.html#addNmeaListener(android.location.GpsStatus.NmeaListener)][addNmeaListener]]
-
 * [[file:/home/troy/workspace/opengts-android/res/layout/activity_main.xml]]
 
     <TextView
@@ -759,4 +968,7 @@ Where:
     }
     
   #+END_SRC
-  
+* Log
+** 2014-03-28
+   + Added Nema Field
+* TODO
