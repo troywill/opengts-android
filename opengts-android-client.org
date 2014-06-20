@@ -145,7 +145,8 @@
 
        </resources>     
      #+END_SRC
-  5. [ ] See Location 6258 in Deitel
+  5. [ ] See Location 5842 in Deitel (5.4.6. activity_settings.xml layout)
+  6. [ ] See Location 6258 in Deitel (5.5.2 onCreate: Setting the Default Preference Values and Registering a Change Listener)
 * [/] Add NMEA code from OpenGTSClient.java Step by step
   1. [ ] Add following java functions to [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
      1. [ ] Move cursor to closing parenthesis at the end of [[file:~/workspace/opengts-android/src/com/example/android/location/MainActivity.java][MainActivity.java]]
