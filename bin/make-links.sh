@@ -6,7 +6,7 @@ set -o nounset
 JAVA_HOME="/usr/lib/jvm/java-7-openjdk"
 ANT_HOME="/usr/share/apache-ant"
 CATALINA_HOME="/usr/share/tomcat7"
-GTS_HOME="/usr/local/OpenGTS_2.5.3"
+GTS_HOME="/usr/local/OpenGTS_2.5.5"
 
 cd /usr/local
 

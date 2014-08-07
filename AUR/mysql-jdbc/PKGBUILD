@@ -10,7 +10,7 @@ license=('GPL2')
 depends=('java-runtime')
 install=mysql-jdbc.install
 source=("http://ftp.gwdg.de/pub/misc/mysql/Downloads/Connector-J/mysql-connector-java-${pkgver}.tar.gz")
-md5sums=('f655c14dde5b9484bf705ef5d49b3b39')
+sha256sums=('5a253a2aa8f06758c1901c3862402c69db601e9de456864ab1922955b225bba6')
 
 package() {
   local connector=mysql-connector-java-$pkgver
@@ -23,4 +23,3 @@ package() {
   install -m644 $srcdir/$connector/{CHANGES,README,docs/connector-j.*} \
     $pkgdir/usr/share/doc/$pkgname
 }
-

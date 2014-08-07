@@ -1,0 +1,40 @@
+* Step by Step
+  1. [ ] Install CelltracGTS/Free from [[https://play.google.com/store/apps/details?id=org.opengts.client.android.cgtsfre&hl=en][Google Play]]
+  2. [ ] Skim http://www.geotelematic.com/CelltracGTS/Free.html
+  3. [ ] Phone
+     1. [ ] Go to Settings
+     2. [ ] Server
+     3. [ ] Make a note of the value displayed in the "Mobile ID" field
+  4. [ ] Log in to Server with web browser
+     5. [ ] Goto Administration/Vehicle Admin
+        1. [ ] Create a new Device record
+           1. [ ] use the id "myphone".
+	   2. [ ] Edit this device/phone record and enter the "Unique ID" as in the following example
+              1. Unique ID:  gprmc_MOBILEID
+              2. MOBILEID is the "Mobile ID" which was displayed on your phone above. Change any of the other device/phone fields as desired, then click change/save to save the changes.    
+
+	
+     
+
+* FOO
+
+Unique ID:  gprmc_MOBILEID 
+
+
+Where "gprmc_" is the unique-id prefix, and MOBILEID is the "Mobile ID" which was displayed on your phone above. Change any of the other device/phone fields as desired, then click change/save to save the changes.    
+
+
+
+* BAR
+Phone Setup
+On you phone, perform the following steps:
+Install the CelltracGTS™/Free application on your Android phone.
+Go to the settings page (press the menu button, then select "Settings") and enter the URL of your "gprmc" service on your server. The URL will be similar to the following (Replace DOMAIN:PORT with the domain name and port on which which your "gprmc" service is running).
+http://DOMAIN:PORT/gprmc/Data?
+Make a note of the value displayed in the "Mobile ID" field at the top of the Settings page. This value typically represents the phone IMEI#, or Android serial#, and will be used to identify the phone to the server. You will be using this value to enter into the "Unique ID" field in the next step below.
+OpenGTS® Account Setup
+In a browser window, connect to your OpenGTS® login page and perform the following steps:
+As described in the "OpenGTS_Config.pdf" document, create an account that you will be using to capture event data from the CelltracGTS™/Free application running on your phone. For the purpose of this example, we will call this account "tracking".
+Log into this account (ie. "tracking") and create a new Device record. For this example we will use the id "myphone". Edit this device/phone record and enter the "Unique ID" as in the following example:
+Unique ID:  gprmc_MOBILEID 
+Where "gprmc_" is the unique-id prefix, and MOBILEID is the "Mobile ID" which was displayed on your phone above. Change any of the other device/phone fields as desired, then click change/save to save the changes.    
