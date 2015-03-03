@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o errexit
+
+VER='2.5.8'
+
+mkdir --parent ~/Downloads
+
+cd ~/Downloads
+
+wget "http://downloads.sourceforge.net/project/opengts/server-base/${VER}/OpenGTS_${VER}.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopengts%2Ffiles%2F%3Fsource%3Ddlp&ts=1425344657&use_mirror=hivelocity" -O "OpenGTS_${VER}.zip"

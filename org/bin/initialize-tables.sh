@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-cd $GTS_HOME
-bin/initdb.sh -rootUser=root
+set -o nounset
+set -o errexit
+
+cd $GTS_HOME && bin/initdb.sh -rootUser=root

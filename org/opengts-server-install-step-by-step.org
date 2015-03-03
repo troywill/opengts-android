@@ -1,6 +1,6 @@
 * Introduction
 * Step by step installation OpenGTS documentation recommendations March 3, 2015
-  1. [ ] Install Apache Tomcat
+  1. [-] Install Apache Tomcat
      1. [ ] Skim https://wiki.archlinux.org/index.php/Tomcat
      2. [ ] install tomcat7 package
         #+BEGIN_SRC sh :tangle bin/install-tomcat.sh :shebang #!/bin/sh
@@ -21,7 +21,7 @@
        sudo pacman --sync apache-ant
      #+END_SRC
      - Packages (2): jdk7-openjdk-7.u65_2.5.1-3  apache-ant-1.9.4-2
-  4. [ ] Install JDBC
+  4. [ ] Install JDBC from AUR
      1. [ ] Skim https://wiki.archlinux.org/index.php/JDBC_and_MySQL#Installing_JDBC
      2. [ ] wget https://aur.archlinux.org/packages/my/mysql-jdbc/mysql-jdbc.tar.gz
 	#+BEGIN_SRC sh :tangle bin/fetch-mysql-jdbc-aur.sh :shebang #!/bin/sh
@@ -43,17 +43,10 @@
           
           sudo cp -iv $FILE $DEST_DIR
 	#+END_SRC
-  5. [-] Install Java Mail
+  5. [ ] Install Java Mail
      1. [ ] Skim https://java.net/projects/javamail/pages/Home
-     2. [ ] Download javax.mail-1.5.2.jar
-	#+BEGIN_SRC sh :tangle bin/download-javax.mail.sh :shebang #!/bin/sh
-          VER="1.5.2"
-          wget https://maven.java.net/content/repositories/releases/com/sun/mail/javax.mail/${VER}/javax.mail-${VER}.jar
-          md5sum javax.mail-${VER}.jar
-                    
-          # 5faf8e62e75b1fa09acf038546187aa7  javax.mail-1.5.2.jar
-          
-	#+END_SRC
+     2. [ ] https://aur.archlinux.org/packages/java-javamail/
+	wget https://aur.archlinux.org/packages/ja/java-javamail/java-javamail.tar.gz
      3. [ ] copy javax.mail-1.5.2.jar to $JAVA_HOME/jre/lib/ext/
 	#+BEGIN_SRC sh :tangle bin/copy-javax.mail.sh :shebang #!/bin/sh
           set -o verbose
@@ -63,18 +56,25 @@
           # works on Arch Linux
           VER="1.5.2"
           JAVA_HOME="/usr/lib/jvm/java-8-openjdk/"
-          sudo cp -v javax.mail-${VER}.jar $JAVA_HOME/jre/lib/ext/
+
+          sudo cp -v /usr/share/java/javamail/javax.mail-${VER}.jar $JAVA_HOME/jre/lib/ext/
 	#+END_SRC
-     4. [ ] https://aur.archlinux.org/packages/java-javamail/
-  6. [ ] Download and install the OpenGTS source
+  6. [-] Download and install the OpenGTS source
      1. [ ] Download OpenGTS_2.5.8.zip to ~/Downloads
 	1. [ ] View http://sourceforge.net/projects/opengts/?source=dlp with web browser
-	   1. [ ] http://downloads.sourceforge.net/project/opengts/server-base/2.5.8/OpenGTS_2.5.8.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopengts%2Ffiles%2F%3Fsource%3Ddlp&ts=1425344657&use_mirror=hivelocity
-    
-	2. [ ] Download OpenGTS_2.5.8.zip to ~/Downloads
-    
-    
-     1. [ ] install OpenGTS to /usr/local
+	2. [ ] wget
+           #+BEGIN_SRC sh :tangle bin/download-opengts :shebang #!/bin/bash
+             set -o errexit
+
+             VER='2.5.8'
+
+             mkdir --parent ~/Downloads
+
+             cd ~/Downloads
+
+             wget "http://downloads.sourceforge.net/project/opengts/server-base/${VER}/OpenGTS_${VER}.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopengts%2Ffiles%2F%3Fsource%3Ddlp&ts=1425344657&use_mirror=hivelocity" -O "OpenGTS_${VER}.zip"
+           #+END_SRC
+     2. [ ] install OpenGTS to /usr/local
 	+ Run as this script as normal user
         + You may have to install unzip
         #+BEGIN_SRC sh :tangle bin/install-opengts.sh :shebang #!/bin/sh
@@ -91,7 +91,7 @@
         echo "Changing ownership to user ${USER}"
         sudo chown --recursive $USER:$GROUP OpenGTS_${VER}
         #+END_SRC
-     2. [ ] Set the Environment Variables
+     3. [ ] Set the Environment Variables
 	+ Edit add following lines to file:/etc/profile:
         #+BEGIN_SRC sh :tangle /tmp/profile.opengts
         # The Java JDK (NOT the JRE) installation directory.
@@ -103,11 +103,11 @@
         # The OpenGTS installation directory.
         export GTS_HOME=/usr/local/OpenGTS_2.5.8
         #+END_SRC
-     3. [ ] source /etc/profile
+     4. [ ] source /etc/profile
 	#+BEGIN_SRC sh
 	  source /etc/profile
 	#+END_SRC
-     4. [ ] Make symbolic links
+     5. [ ] Make symbolic links
         #+BEGIN_SRC sh :tangle bin/make-links.sh :shebang #!/bin/bash
           set -o nounset
           set -o verbose
@@ -126,69 +126,89 @@
           ln -sv $CATALINA_HOME tomcat
           ln -sfv $GTS_HOME gts
         #+END_SRC
-     5. [ ] Compile the Supporting GTS Library Files.
+     6. [ ] Compile the Supporting GTS Library Files.
         1. [ ] 'cd' into the OpenGTS installation directory and
            compile the jar files, and servlet war files, using the
            supplied Ant "build.xml" script:
            #+BEGIN_SRC sh
-             cd $GTS_HOME
-             ant all
+             cd $GTS_HOME && ant all
            #+END_SRC
-     6. [ ] Initialize the SQL Database Tables
-	#+BEGIN_SRC sh :tangle bin/initialize-tables.sh :shebang #!/bin/sh
-           cd $GTS_HOME
-           bin/initdb.sh -rootUser=root
+     7. [ ] Initialize the SQL Database Tables
+	#+BEGIN_SRC sh :tangle bin/initialize-tables.sh :shebang #!/bin/bash
+           set -o nounset
+           set -o errexit
+
+           cd $GTS_HOME && bin/initdb.sh -rootUser=root
 	#+END_SRC
-     7. [ ] Test the installation
+     8. [ ] Test the installation
+	#+BEGIN_SRC sh :tangle bin/check-install.sh :shebang #!/bin/bash
+          set -o verbose
+          set -o nounset
+
+          cd $GTS_HOME && bin/checkInstall.sh
+	#+END_SRC
+     9. (optional) Load the sample data
 	#+BEGIN_SRC sh
-	  bin/checkInstall.sh
 	#+END_SRC
-     8. [ ] (optional) Load the sample data
-	#+BEGIN_SRC sh
-	#+END_SRC
-     9. [ ] Create the sysadmin account
-	#+BEGIN_SRC sh
-           bin/admin.sh Account -account=sysadmin -pass=password -create
-	#+END_SRC
-     10. [ ] Create additional account
+     10. [ ] Create the sysadmin account
+	 #+BEGIN_SRC sh :tangle bin/create-sysadmin-account.sh :shebang #!/bin/bash
+            set -o nounset
+            set -o verbose
+
+            cd $GTS_HOME && ./bin/admin.sh Account -account=sysadmin -pass=password -create
+	 #+END_SRC
+     11. (optional) Create additional account
 	 #+BEGIN_SRC sh :tangle /tmp/create-additional-account.sh :shebang #!/bin/sh
             bin/admin.sh Account -account=FOO -pass=password -create
 	 #+END_SRC
-     11. [ ] Install track.war
-	 1. [ ] Build
-            #+BEGIN_SRC sh
+     12. [ ] Install track.war
+	 1. [ ] Build track.war
+            #+BEGIN_SRC sh  :tangle bin/install-track-war.sh :shebang #!/bin/bash
+              set -o verbose
+              set -o nounset
+
               cd $GTS_HOME && ant track
             #+END_SRC
 	 2. [ ] Copy track.war
-            #+BEGIN_SRC sh
-              sudo cp -v build/track.war $CATALINA_HOME/webapps
+            #+BEGIN_SRC sh :tangle bin/copy-track-war.sh :shebang #!/bin/bash
+              set -o verbose
+              set -o nounset
+
+              cd $GTS_HOME && sudo cp -v ./build/track.war $CATALINA_HOME/webapps
             #+END_SRC
-     12. [-] Install events.war Java servlet
-	 1. [ ] Compile events.war" Java servlet
-            #+BEGIN_SRC sh
-              cd $GTS_HOME && ant events
-            #+END_SRC
-	 2. [ ] Install events.war
-            #+BEGIN_SRC sh
-              sudo cp -v build/events.war $CATALINA_HOME/webapps
-            #+END_SRC
-	 3. [ ] Test the installation
-            #+BEGIN_SRC sh
-		cd /tmp && wget 'http://localhost:8080/events/data.json?a=demo&p=&d=demo'
-            #+END_SRC
-	 4. [ ] http://localhost:8080/track/Track
-	    + Account :: sysadmin
-	    + User :: (blank)
-	    + Password :: password
-     13. [ ] Create a device communication server
-	 1. [ ] build the gpmrc servlet
-            #+BEGIN_SRC sh
-              cd $GTS_HOME && ant gprmc
-            #+END_SRC
-	 2. [ ] install gprmc.war
-            #+BEGIN_SRC sh
-              sudo cp -v build/gprmc.war $CATALINA_HOME/webapps           
-            #+END_SRC
+     13. [ ] Install events.war Java servlet
+	 #+BEGIN_SRC sh  :tangle bin/install-events-war.sh :shebang #!/bin/bash
+           set -o verbose
+           set -o nounset
+           set -o errexit
+
+           # Compile events.war" Java servlet
+           cd $GTS_HOME && ant events
+
+           sudo cp -v build/events.war $CATALINA_HOME/webapps
+         #+END_SRC
+     14. [ ] Create a device communication server
+	#+BEGIN_SRC sh  :tangle bin/install-gmrmc-war.sh :shebang #!/bin/bash
+          set -o verbose
+          set -o nounset
+          set -o errexit
+
+          # build the gpmrc servlet
+          cd $GTS_HOME && ant gprmc
+
+          # install gprmc.war
+          sudo cp -v build/gprmc.war $CATALINA_HOME/webapps           
+        #+END_SRC
+     15. [ ] Test the installation
+             #+BEGIN_SRC sh
+		 cd /tmp && wget 'http://localhost:8080/events/data.json?a=demo&p=&d=demo'
+             #+END_SRC
+     16. [ ] http://localhost:8080/track/Track
+	 + Account :: sysadmin
+	 + User :: (blank)
+	 + Password :: password
+	 + Error reading Account
+	 + sudo systemctl enable tomcat7
 * LOGIN
 ** [[http://localhost:8080/track/Track]]
 *** sysadmin

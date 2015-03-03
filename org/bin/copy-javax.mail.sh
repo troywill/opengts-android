@@ -7,4 +7,5 @@ set -o errexit
 # works on Arch Linux
 VER="1.5.2"
 JAVA_HOME="/usr/lib/jvm/java-8-openjdk/"
-sudo cp -v javax.mail-${VER}.jar $JAVA_HOME/jre/lib/ext/
+
+sudo cp -v /usr/share/java/javamail/javax.mail-${VER}.jar $JAVA_HOME/jre/lib/ext/
